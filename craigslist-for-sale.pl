@@ -62,7 +62,7 @@ my $escsearch = uri_escape( $search );
 # Add Craigslist RSS search feeds here:
 my @feeds = ( 
   #"http://seattle.craigslist.org/search/sss?query=$search&srchType=A&format=rss",
-    "http://seattle.craigslist.org/escsearch/sss?query=$search&srchType=A&format=rss",
+    "http://seattle.craigslist.org/search/sss?query=$escsearch&srchType=A&format=rss",
 );
 
 sub debug {
@@ -187,6 +187,7 @@ for my $feed (@feeds)
 
   unless ($count > 0) {
     $message .="<P> No results found!</P>\n";
+  }
 }
 
 
