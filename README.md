@@ -1,5 +1,5 @@
 
-CRAIGSLIST APARTMENT SEARCH TOOL
+CRAIGSLIST SEARCH TOOLS
 
 ./craigslist-apartment.pl 
   - [--sqft=<min sq ft>]      - Show apartments with this much or more space
@@ -9,10 +9,18 @@ CRAIGSLIST APARTMENT SEARCH TOOL
   - [--newer-than=minutes]    - Show ones listed at least this recently
   - [--format=<html|plain>]   - Output format, plain for email, html for web
 
+./craigslist-for-sale.pl 
+  - <--search 'whatever'>     - Search for something for sale
+  - Other options as above, except no sqft
+
+
+Want to send email results?  Use the included make_mime_mail tool.
 
 ./make_mime_mail.pl <subject> <to> <from>
   - Send email to someone as a HTML mail.
 
+Example:
+* ./craigslist-for-sale.pl --search whatever | ./make_mime_mail.pl 'Your Search' youremail youremail
 
 Based on the car search code by http://jeremy.zawodny.com/blog/archives/001440.html
 

@@ -56,13 +56,13 @@ my ($pricemin,$pricemax,$regex,$newerthan,$search) = @o{'pricemin','pricemax','r
 
 if( defined $o{debug} && $o{debug} ) { $debug = 1; }
 
-$search = uri_escape( $search );
+my $escsearch = uri_escape( $search );
 
 
 # Add Craigslist RSS search feeds here:
 my @feeds = ( 
   #"http://seattle.craigslist.org/search/sss?query=$search&srchType=A&format=rss",
-    "http://seattle.craigslist.org/search/sss?query=$search&srchType=A&format=rss",
+    "http://seattle.craigslist.org/escsearch/sss?query=$search&srchType=A&format=rss",
 );
 
 sub debug {
@@ -184,6 +184,9 @@ for my $feed (@feeds)
     # don't suck feeds too quickly
     #sleep 2;
   $message .= "</table>\n";
+
+  unless ($count > 0) {
+    $message .="<P> No results found!</P>\n";
 }
 
 
