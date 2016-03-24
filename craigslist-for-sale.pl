@@ -35,8 +35,18 @@ my @feeds = (
 ########################################################################
 
 # TODO: Set HTML Headers/Footers.
-my $HTML_HEADER = q||;
-my $HTML_FOOTER = q||;
+my $HTML_HEADER = q|<!DOCTYPE html><html lang="en">
+<head>
+  <style>
+  p, body, div, td { font-size: 9pt; }
+
+  table { padding: 0; border: 1px solid black; }
+  tr { background-color: #EEE; }
+  </style>
+</head>
+<body>
+|;
+my $HTML_FOOTER = q|</body></html>|;
 
 # timestamp information
 my $dtnow = DateTime->now( time_zone => 'America/Los_Angeles' );
@@ -55,10 +65,6 @@ my $count = 0;
 
 # TODO: move style into a stylesheet to include
 my $style = qq|
-<style>
-p, body, div, td {
- font-size: 9pt;
- }
 </style>
 
 |;
@@ -131,6 +137,7 @@ if( defined $o{format} && $o{format} eq 'html' ) {
 if( defined $o{debug} && $o{debug} ) { $debug = 1; }
 
 # Set formatting junk.
+format_msg('', $HTML_HEADER );
 format_msg('', "<h1>Craigslist search for '$search'!</h1>");
 
 ########################################################################
@@ -167,7 +174,8 @@ foreach my $feed (@feeds) {
     }
 
     format_msg("Feed URL: $feed","<h2> Feed URL: <a href='$feed'>$feed</a></h2>\n");
-    format_msg('',"<table>\n");
+    format_msg('',"<table cellspacing='0' >\n");
+		format_msg('',"<tr><th></th><th>Title</th><th>Price</th><th>Age (minutes)</th></tr>");
 
     my %Item;
     for my $item (@$items) {
@@ -184,6 +192,12 @@ foreach my $feed (@feeds) {
       $Item{ $dcdate }->{url} = $url;
       $Item{ $dcdate }->{date} = $dcdate;
       $Item{ $dcdate }->{age} = $d->delta_minutes;
+		  $Item{ $dcdate }->{description} = $item->{description};
+
+		  # Include the image if it's there.
+      if( $item->{'enc:enclosure'} ) {
+				$Item{ $dcdate }->{image} = $item->{'enc:enclosure'}->{resource};
+      }
     }
 
     my $s = 0;
@@ -192,6 +206,7 @@ foreach my $feed (@feeds) {
         my $title = $item->{title};
         my $url = $item->{url};
         my $dcdate = $item->{'date'};
+				my $desc = $item->{'description'};
         $s = 0;
 
         # Default to show responses
@@ -239,10 +254,23 @@ foreach my $feed (@feeds) {
           $count ++;
           format_msg("$title (age: $age_minutes)\n  $url\n\n",
             qq|<tr>
-            <td><a href="$url">click</a></td><td>$title</td>
-            <td>\$$amount</td><td>Age: $age_minutes minutes</td>
+            <td><a href="$url">click</a></td>
+						<td> $title</td>
+            <td> \$$amount</td>
+            <td style='width: 7em; text-align: center;'> $age_minutes </td>
             </tr>\n|
           );
+
+          my $img;
+					if ( $item->{image} ) {
+						$img = sprintf "<img width='100' height='100' src='%s' />", $item->{image};
+					}
+ 					else {
+					  $img = '[no image]';
+          }
+
+					format_msg('',"<tr style='background-color: #CCC;'><td colspan='2'>$desc</td><td colspan='2'>$img</td></tr>");
+					format_msg('',"<tr style='background-color: #CCC;'><td colspan='4' style='text-align: center;'>---</td></tr>");
         }
     }
     # don't suck feeds too quickly
@@ -255,6 +283,7 @@ foreach my $feed (@feeds) {
   }
 }
 
+format_msg('',$HTML_FOOTER);
 # Render HTML
 if( $format eq 'html' ) {
   print $message;
