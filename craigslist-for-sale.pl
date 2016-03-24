@@ -14,6 +14,19 @@ use URI::Escape;
 
 use Getopt::Long;
 
+### CONFIGURATION OPTIONS ###
+
+# Add Craigslist RSS search feeds here:
+# 
+# Supports multiple feed URLs.  Each will be parsed and returned; can be done
+# to support multiple geographical areas.  Make sure to have query=_SEARCH_ to
+# enable proper substitution within search process.
+#
+my @feeds = (
+    "http://seattle.craigslist.org/search/sss?query=_SEARCH_&srchType=A&format=rss",
+);
+
+
 my $style = qq|
 <style>
 p, body, div, td {
@@ -38,13 +51,15 @@ GetOptions( \%o,
   'reallydebug'
 );
 
-if( $o{help} ) {
+sub help {
   print << "END";
 $0 <--search thing> [--pricemin=dollars] [--pricemax=dollars] [--regex=search] [--newer-than=minutes] [--format=<html|plain>]
 
 END
   exit;
 } 
+
+help() if( $o{help} );
 
 if( defined $o{format} && $o{format} eq 'html' ) {
   $format = $o{format};
@@ -58,12 +73,13 @@ if( defined $o{debug} && $o{debug} ) { $debug = 1; }
 
 my $escsearch = uri_escape( $search );
 
+unless (defined $escsearch) {
+  printf "[CRIT] No search string provided, bye!\n";
 
-# Add Craigslist RSS search feeds here:
-my @feeds = ( 
-  #"http://seattle.craigslist.org/search/sss?query=$search&srchType=A&format=rss",
-    "http://seattle.craigslist.org/search/sss?query=$escsearch&srchType=A&format=rss",
-);
+  help();
+  exit 1;
+}
+
 
 sub debug {
   if( $debug ) {
@@ -79,14 +95,13 @@ my $message;
 if( $format eq 'html' ) {
   $message .= $style;
   $message .= "<h1>Craigslist search for '$search'!</h1>";
-
-
 }
 
 my $count = 0;
 
 for my $feed (@feeds)
 {
+    $feed =~ s/_SEARCH_/$escsearch/g;
     debug "Searching $feed";
     my $xml = get($feed);
     debug "Parsing results";
