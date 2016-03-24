@@ -1,6 +1,14 @@
 
 CRAIGSLIST SEARCH TOOLS
 
+./craigslist-for-sale.pl 
+  - <--search 'whatever'>     - Search for something for sale
+  - Other options as above, except no sqft
+
+
+
+* The apartment tool is not being worked on, so enjoy.  New work is going into 'craigslist-for-sale'
+
 ./craigslist-apartment.pl 
   - [--sqft=<min sq ft>]      - Show apartments with this much or more space
   - [--pricemin=dollars]      - Only show ones that cost at least this much
@@ -8,11 +16,6 @@ CRAIGSLIST SEARCH TOOLS
   - [--regex=search]          - Filter, perl regex
   - [--newer-than=minutes]    - Show ones listed at least this recently
   - [--format=<html|plain>]   - Output format, plain for email, html for web
-
-./craigslist-for-sale.pl 
-  - <--search 'whatever'>     - Search for something for sale
-  - Other options as above, except no sqft
-
 
 Want to send email results?  Use the included make_mime_mail tool.
 
